@@ -1,0 +1,86 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>An FSM Simulator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style/page.css">
+</head>
+<body>
+    <div class="all">
+    <h1>A Finite State Machine Simulator</h1>
+    <h3 id="fsmName"></h3>
+    <div class="column">
+        <h2>Basic Specs</h2>
+        <table class="specs">
+            <tr><th id="thInputs">Inputs</th><td class="rightmost" id="specInputs"></td></tr>
+            <tr><th id="thOutputs">Outputs</th><td class="rightmost" id="specOutputs"></td></tr>
+            <tr><th id="thStates">States</th><td class="rightmost" id="specStates"></td></tr>
+            <tr><th>Reset State</th><td class="rightmost" id="specReset"></td></tr>
+            <tr><th>Machine Type</th><td class="rightmost" id="specType"></td></tr>
+        </table>
+        <p><i>Note: All inputs and outputs are 1-bit signals.</i></p>
+        <div id="diagramSection">
+<!--             <h2>State Transition Diagram</h2>
+            <img src="" alt="State Transition Diagram"> -->
+        </div>
+    </div>
+    <div class="column">
+        <h2>Simulation Panel</h2>
+        <p>
+            Select an input and click <strong>Clock Edge</strong> to advance to the next state on active clock edge.<br>
+            <br><i>Note: All inputs and outputs are 1-bit signals.</i>
+        </p>
+        <table class="panel">
+            <tr>
+                <th>Current State</th>
+                <th id="thCurOut">Current Outputs</th>
+                <th id="thCurIn">Current Inputs</th>
+                <th class="rightmost">Next State</th>
+            </tr>
+            <tr>
+                <td id="curState"></td>
+                <td id="curOut"></td>
+                <td>
+                    <select id="curIn">
+                        <option value="undefined" selected disabled>Select</option>
+                    </select>
+                </td>
+                <td id="nextState" class="rightmost"></td>
+            </tr>
+        </table><br>
+        <button type="button" id="clkEdgeBtn">Clock Edge</button>
+        <button type="button" id="resetBtn">Asynchronous Reset</button>
+        <!-- insert here -->
+        <h2>Waveform Generator</h2>
+        <!-- <form name = "myform">
+            Enter the inputs (same length):
+            <br>
+            Ta: <input type = "text" name = "inputbox1" value = "11100011100">
+            Tb: <input type = "text" name = "inputbox2" value = "00111100000">
+            <input type = "button" name = "button" value = "submit" onclick = "updateWave(this.form)">
+        </form>
+        <br> -->
+        Enter the input(s) (same length):
+        <div id="container"></div>
+        <input type = "button" name = "button" value = "submit" onclick = "updateWave()">
+        <br><br>
+
+        <canvas id="myCanvas" width="300" height="300" style="border:1px solid #000000;"> </canvas>
+        <br>
+        <input type="button" value="Prev" style="float: left;" onclick = "prevCycle()">
+        <input type="button" value="Next" style="float: right;" onclick = "nextCycle()">
+        <br><br>
+        <h2>HDL Generator</h2>
+        <p>Click <strong>Verilog</strong> to see the FSM described using the Hardware Description Language.</p>
+        <button type="button" id="verilogBtn">Verilog</button>
+        <pre><code id="hdl"></code></pre>
+    </div>
+    </div>
+    <script src="scripts/polyfill.js"></script>
+    <script src="scripts/backend.js"></script>
+    <script src="scripts/run_page.js"></script>
+    <script type="text/javascript" src="waveform.js"></script>
+</body>
+</html>
