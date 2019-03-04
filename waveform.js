@@ -1,7 +1,9 @@
 var myCanvas = document.getElementById("myCanvas");
 myCanvas.width = 500;
-myCanvas.height = 500;
-  
+// myCanvas.height = 500;
+if  (typeof FSM._outputs === 'string' || FSM._outputs instanceof String) myCanvas.height = 50* (3+FSM._inputs.length+1)
+else    myCanvas.height = 50* (3+FSM._inputs.length+FSM._outputs.length)
+
 var ctx = myCanvas.getContext("2d");
 // var inputs = ["11100011100","00111100000"]
 var inputs = []
