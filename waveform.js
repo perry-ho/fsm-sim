@@ -921,13 +921,13 @@ function writeTBCode(){
     var delay2 = num.toString() ;
 
     var code =
-    "'timescale " + timescale + " ns / " + timeprec + " ps\n" +
-    "module fsm ();\n" +
+    "'timescale " + timescale + " ns / " + timeprec + " ps\n\n" +
+    "module fsm ();\n\n" +
     "reg clk, reset, " + FSM._inputs.join(", ") + ";\n" +
     "wire " + FSM._outputs.join(", ") + ";\n\n" +
     "fsm dut(\n" +
     "\tclk,reset, " + FSM._inputs.join(", ") + ",\n" +
-    FSM._outputs.join(", ") + "\n);\n\n" +
+    "\t" + FSM._outputs.join(", ") + "\n);\n\n" +
     "always\n#" + delay1 + " clk = ~clk\n\n" +
     "initial\nbegin\n\n" +
     "clk = 1'b0;\n\n";
