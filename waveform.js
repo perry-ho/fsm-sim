@@ -926,7 +926,7 @@ function writeTBCode(){
     "reg clk, reset, " + FSM._inputs.join(", ") + ";\n" +
     "wire " + FSM._outputs.join(", ") + ";\n\n" +
     "fsm dut(\n" +
-    "\tclk,reset, " + FSM._inputs.join(", ") + ",\n" +
+    "\tclk, reset, " + FSM._inputs.join(", ") + ",\n" +
     "\t" + FSM._outputs.join(", ") + "\n);\n\n" +
     "always\n#" + delay1 + " clk = ~clk\n\n" +
     "initial\nbegin\n\n" +
