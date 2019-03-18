@@ -876,40 +876,77 @@ function toggleOptions(button){
 //     drawAll(myCanvas,myoptions,inputs);
 // }
 
-function clearinputs(){
-    if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
-        var n = FSM._inputs.length;
-    }
-    else var n = 1;
-    for (var i=0;i<n;i++){           
-        inputs[i] = "0";
-    }
-    myoptions.startclock = 1;
-    drawAll(myCanvas,myoptions,inputs);
-}
+// function clearinputs(){
+//     if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+//         var n = FSM._inputs.length;
+//     }
+//     else var n = 1;
+//     for (var i=0;i<n;i++){           
+//         inputs[i] = "0";
+//     }
+//     myoptions.startclock = 1;
+//     drawAll(myCanvas,myoptions,inputs);
+// }
 
-function randomize(){
+// function randomize(){
 
-    if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
-        var n = FSM._inputs.length;
-    }
-    else var n = 1;
+//     if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+//         var n = FSM._inputs.length;
+//     }
+//     else var n = 1;
 
-    var container = document.getElementById("moreoptions");
+//     var container = document.getElementById("moreoptions");
 
-    for (var i=0;i<n;i++){  
-        var inputstr = "";
-        var numClk = container.childNodes[n*3+3].value;
+//     for (var i=0;i<n;i++){  
+//         var inputstr = "";
+//         var numClk = container.childNodes[n*3+3].value;
 
-        for (var j=0; j< numClk ;j++) {
+//         for (var j=0; j< numClk ;j++) {
             
-            inputstr += String.fromCharCode(48+(Math.floor(Math.random()*2)));
-        }      
+//             inputstr += String.fromCharCode(48+(Math.floor(Math.random()*2)));
+//         }      
          
-        inputs[i] = inputstr; 
-    } 
-    myoptions.startclock = 1;   
-    drawAll(myCanvas,myoptions,inputs);
+//         inputs[i] = inputstr; 
+//     } 
+//     myoptions.startclock = 1;   
+//     drawAll(myCanvas,myoptions,inputs);
+// }
+function writeTBCode(){
+    var timescale = document.getElementById("timescale").value;
+    var timeprec = document.getElementById("timeprec").value;
+    var clockspd = document.getElementById("clockspd").value;
+    var num = 1000 / (2*timescale*clockspd);
+    var delay1 = num.toString() ;
+    num = 1000 / (timescale*clockspd);
+    var delay2 = num.toString() ;
+
+    var code =
+    "'timescale " + timescale + " ns / " + timeprec + " ps\n" +
+    "module fsm ();\n" +
+    "reg clk, reset, " + FSM._inputs.join(", ") + ";\n" +
+    "wire " + FSM._outputs.join(", ") + ";\n\n" +
+    "fsm dut(\n" +
+    "\tclk,reset, " + FSM._inputs.join(", ") + ",\n" +
+    FSM._outputs.join(", ") + "\n);\n\n" +
+    "always\n#" + delay1 + " clk = ~clk\n\n" +
+    "initial\nbegin\n\n" +
+    "clk = 1'b0;\n\n";
+    
+    for (var j=0; j<inputs[0].length; j++){
+        if (inputs.length > 1){
+            for (var i=0; i<inputs.length; i++){
+                code += FSM._inputs[i] + "=" + inputs[i][j] + ";#" + delay2 + ";\n";
+            }
+        }
+        else {
+            code += FSM._inputs + "=" + inputs[0][j] + ";#" + delay2 + ";\n";
+        }
+    }
+
+    code += "\nend\n\n" +
+    "endmodule\n";
+
+    return code;
 }
 
 function getOutput(state,curIn) {
@@ -923,6 +960,10 @@ function getOutput(state,curIn) {
         }
     }
 }
+function displayTBCode() {
+    document.getElementById("TBCode").innerHTML = writeTBCode();
+
+}
 // function readTable(table, curIn) {
 //     for (var input in table) {
 //         var pattern = new RegExp(input.replace(/X/g, "[01]"));
@@ -935,3 +976,5 @@ function getOutput(state,curIn) {
 
 addFields();
 drawAll(myCanvas,myoptions,inputs);
+
+document.getElementById("TBBtn").onclick = displayTBCode;

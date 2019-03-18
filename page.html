@@ -79,6 +79,19 @@
         <p>Click <strong>Verilog</strong> to see the FSM described using the Hardware Description Language.</p>
         <button type="button" id="verilogBtn">Verilog</button>
         <pre><code id="hdl"></code></pre>
+
+        <h2>TestBench Code Generator</h2>
+        <p>Click <strong>TBCode</strong> to see the TestBench Code.</p>
+        <button type="button" id="TBBtn">Verilog</button>
+        <br>
+        timescale = 
+        <input type = "text" id = "timescale" name = "timescale" value = "1"> ns /
+        <input type = "text" id = "timeprec" name = "timeprec" value = "100"> ps
+        <br>
+        clockspeed =
+        <input type = "text" id = "clockspd" name = "clockspd" value = "50"> MHz
+        <pre><code id="TBCode"></code></pre>
+
     </div>
     </div>
     <script src="scripts/polyfill.js"></script>
