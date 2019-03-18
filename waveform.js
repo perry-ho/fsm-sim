@@ -1,11 +1,24 @@
 var myCanvas = document.getElementById("myCanvas");
 myCanvas.width = 500;
 // myCanvas.height = 500;
-if  (typeof FSM._outputs === 'string' || FSM._outputs instanceof String) myCanvas.height = 50* (3+FSM._inputs.length+1)
-else    myCanvas.height = 50* (3+FSM._inputs.length+FSM._outputs.length)
-
+if  (typeof FSM._outputs === 'string' || FSM._outputs instanceof String) {
+    if  (typeof FSM._inputs === 'string' || FSM._inputs instanceof String) {
+        myCanvas.height = 300;
+    }
+    else {
+        myCanvas.height = 50* (5+FSM._inputs.length);
+    }
+}
+else    {
+    if  (typeof FSM._inputs === 'string' || FSM._inputs instanceof String) {
+        myCanvas.height = 50* (5+FSM._outputs.length);
+    }
+    else{
+        myCanvas.height = 50* (4+FSM._inputs.length+FSM._outputs.length);
+    }
+}
 var ctx = myCanvas.getContext("2d");
-// var inputs = ["11100011100","00111100000"]
+
 var inputs = []
 
 
@@ -309,90 +322,68 @@ function drawAll (canvas,options,inputs){
     )
     wavecount++;
     clockWave.draw();
-    // var resetStr = inputs[0];
-    // resetStr = (resetStr.replace(/1/g, "0")).replace("0","1");
-    // var reset = new Waveform(
-    //     myCanvas,
-    //     resetStr,
-    //     options,
-    //     wavecount,
-    //     "RST"
-    // )
-    // wavecount++;
-    // reset.draw();
+    var resetStr = "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+    var reset = new Waveform(
+        myCanvas,
+        resetStr,
+        options,
+        wavecount,
+        "RST"
+    )
+    wavecount++;
+    reset.draw();
 
-    // var Ta = new Waveform(
-    //     myCanvas,
-    //     input1,
-    //     options,
-    //     wavecount,
-    //     "Ta"
-    // )
-    // wavecount++;
-    // Ta.draw();
-
-    // var Tb = new Waveform(
-    //     myCanvas,
-    //     input2,
-    //     options,
-    //     wavecount,
-    //     "Tb"
-    // )
-    // wavecount++;
-    // Tb.draw();
-
-    // var nextState = new stateWave(
-    //     myCanvas,
-    //     "00012230011",
-    //     options,
-    //     wavecount,
-    //     "S'"
-    // )
-    // wavecount++;
-    // nextState.draw();
-
-    // var curState = new stateWave(
-    //     myCanvas,
-    //     "?0001223001",
-    //     options,
-    //     wavecount,
-    //     "S"
-    // )
-    // wavecount++;
-    // curState.draw();
-
-    var n = FSM._inputs.length;
-    for (var i=0; i<n;i++){
+    if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+        var n = FSM._inputs.length;
+        for (var i=0; i<n;i++){
+            inputWave = new Waveform(
+                myCanvas,
+                inputs[i],
+                options,
+                wavecount,
+                FSM._inputs[i]
+            )
+            wavecount++;
+            inputWave.draw();
+        }
+    }
+    else {
         inputWave = new Waveform(
             myCanvas,
-            inputs[i],
+            inputs[0],
             options,
             wavecount,
-            FSM._inputs[i]
+            FSM._inputs
         )
         wavecount++;
         inputWave.draw();
     }
-    // n = FSM._states.length;
-    // for (var i=0; i<n;i++){
+
+
     var stateArr = [];
     var stateName = [];
-    // var outputA = [];
-    // var outputB = [];
+
     var outputs = [];
-    
     stateArr[0] = FSM._resetState;
-    stateName[0] = stateArr[0]._name;
+    stateArr[1] = FSM._resetState;
+    stateName[0] = "?";
+    stateName[1] = stateArr[1]._name;
+    if  (typeof FSM._outputs === 'string' || FSM._outputs instanceof String) {
+        outputs[0] = "?";
+    }
+    else {
+        var outputstr = "";
+        for (var i=0;i<FSM._outputs.length;i++){
+            outputstr += "?";
+        }
+        outputs[0]= outputstr;
+    }
+    if (FSM._type == "Moore"){
+        outputs[1] =  getOutput(stateArr[1], "0");
+    }
 
-    outputs[0] =  getOutput(stateArr[0], inputs[0][0]);
-    // for (var i =0;i<FSM._outputs.length;i++){
-    //     outputs[i][0] = outputstr[i];
-    // }
-    // outputA[0] = stateArr[0]._outputs.slice(0,2);
-    // outputB[0] = stateArr[0]._outputs.slice(2);
 
-
-    for (var j=0;j<inputs[0].length;j++){
+    for (var j=1;j<inputs[0].length;j++){
         var inputstr= "";
         for (var i=0; i<inputs.length; i++){
             inputstr = inputstr + inputs[i][j];
@@ -401,22 +392,14 @@ function drawAll (canvas,options,inputs){
         stateName[j+1] = readTable (stateArr[j]._transition, inputstr);
         stateArr[j+1] = FSM._stateObj[stateName[j+1]];
         if (FSM._type == "Moore"){
-            outputs[j+1] = getOutput(stateArr[j+1], inputs[0][0]);
+            outputs[j+1] = getOutput(stateArr[j+1], "0");
         }
         else {
-            outputs[j] = getOutput(stateArr[j], inputs[0][j]);
+            outputs[j] = getOutput(stateArr[j], inputstr);
         }
-        // for (var i =0;i<FSM._outputs.length;i++){
-        //     outputs[i][j+1] = outputstr[i];
-        // }
-        // outputA[j+1] = stateArr[j+1]._outputs.slice(0,2);
-        // outputB[j+1] = stateArr[j+1]._outputs.slice(2);
     }
 
-    // stateName[1] = readTable (stateArr[0]._transition, inputs[0][0]+inputs[1][0]);
-    // stateArr[1] = FSM._stateObj[stateName[1]];
-    // stateName[2] = readTable (stateArr[1]._transition, inputs[0][1]+inputs[1][1]);    
-    // readTable(FSM._curState._transition, curIn)
+
     var curState = new stateWave(
         myCanvas,
         stateName,
@@ -427,7 +410,7 @@ function drawAll (canvas,options,inputs){
     wavecount++;
     curState.draw();
     
-    if (!(typeof FSM._outputs === 'string' || FSM._outputs instanceof String)) {
+    if (!(typeof FSM._outputs == 'string' || FSM._outputs instanceof String)) {
         for (var i =0;i<FSM._outputs.length;i++){
             var splitoutputs = [];
             for (var j=0; j<outputs.length; j++){
@@ -494,23 +477,36 @@ function nextCycle() {
 
 function updateWave() {
     var container = document.getElementById("container");
-    var n = FSM._inputs.length;
+    var numInputEl = 3;
+    if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+        var n = FSM._inputs.length;
+    }
+    else var n = 1;
     var test = 1;
     var length = container.childNodes[1].value.length;
     for (var i=0; i<n;i++){
-        test = test && isNumberString(container.childNodes[i*3+1].value) && (length == container.childNodes[i*3+1].value.length);
+        test = test && isBinaryString(container.childNodes[i*numInputEl+1].value) && (length == container.childNodes[i*numInputEl+1].value.length);
     }
-    // var test = isNumberString(form.inputbox1.value) && isNumberString(form.inputbox2.value) && (form.inputbox1.value.length == form.inputbox2.value.length);
+
     if (!test)
         alert("Input(s) invalid");
     else {
         for (var i=0; i<n;i++){
-            inputs[i] = container.childNodes[i*3+1].value;
+            inputs[i] = container.childNodes[i*numInputEl+1].value;
         }
-        // inputs[0] = form.inputbox1.value;
-        // inputs[1] = form.inputbox2.value;
+
         drawAll(myCanvas,myoptions,inputs);
     }
+}
+function isBinaryString (InString)  {
+    if(InString.length==0) return (false);
+    var RefString="10";
+    for (Count=0; Count < InString.length; Count++)  {
+        TempChar= InString.substring (Count, Count+1);
+        if (RefString.indexOf (TempChar, 0)==-1)  
+            return (false);
+    }
+    return (true);
 }
 function isNumberString (InString)  {
     if(InString.length==0) return (false);
@@ -524,17 +520,30 @@ function isNumberString (InString)  {
 }
 function addFields(){    
     var container = document.getElementById("container");
-    var n = FSM._inputs.length;
-    for (var i=0;i<n;i++){
-        container.appendChild(document.createTextNode(FSM._inputs[i]+" "));
+    if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+        var n = FSM._inputs.length;
+        for (var i=0;i<n;i++){
+            container.appendChild(document.createTextNode(FSM._inputs[i]+" "));
+            var input = document.createElement("input");
+            input.type = "text";
+            input.name = FSM._inputs[i];
+            input.value = "0";
+            container.appendChild(input);
+            container.appendChild(document.createElement("br"));
+            inputs[i]="0";
+        }
+    }
+    else {
+        container.appendChild(document.createTextNode(FSM._inputs+" "));
         var input = document.createElement("input");
         input.type = "text";
-        input.name = FSM._inputs[i];
+        input.name = FSM._inputs;
         input.value = "0";
         container.appendChild(input);
         container.appendChild(document.createElement("br"));
-        inputs[i]="0";
+        inputs[0]="0";
     }
+    
     // var button = document.createElement("input");
     // button.name = "button";
     // button.type = "button";
@@ -543,6 +552,366 @@ function addFields(){
     // container.appendChild(button);
     // container.appendChild(document.createElement("br"));
 }
+function toggleOptions(button){
+    var optionbtn = button;
+    var container = document.getElementById("moreoptions");
+
+    if (optionbtn.value == "more input options") {
+        optionbtn.value = "hide input options";
+        if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+            container.appendChild(document.createElement("br"));
+            container.appendChild(document.createTextNode("Append patterns or randomize"));
+            var randomBtn = document.createElement("input");
+            randomBtn.type = "button";
+            randomBtn.name = "randomBtn";
+            randomBtn.value = "Randomize";
+            // randomBtn.addEventListener("click", randomize, false);
+            randomBtn.onclick = function(){
+                if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+                    var n = FSM._inputs.length;
+                }
+                else var n = 1;
+            
+                var container = document.getElementById("moreoptions");
+                
+                for (var i=0;i<n;i++){  
+                    var inputstr = "";
+                    var numClk = container.childNodes[n*3+3].value;
+            
+                    for (var j=0; j< numClk ;j++) {
+                        
+                        inputstr += String.fromCharCode(48+(Math.floor(Math.random()*2)));
+                    }      
+                     
+                    inputs[i] = inputstr; 
+                } 
+                myoptions.startclock = 1;   
+                drawAll(myCanvas,myoptions,inputs);
+
+                container = document.getElementById("container");
+                for (var i=0; i<n;i++){
+                    container.childNodes[i*3+1].value = inputs[i];
+                }
+            }
+
+            var n = FSM._inputs.length;
+            for (var i=0;i<n;i++){
+                container.appendChild(document.createElement("br")); 
+                container.appendChild(document.createTextNode(FSM._inputs[i]+": "));
+                var input = document.createElement("input");
+                input.type = "text";
+                input.name = FSM._inputs[i]+"pattern";
+                input.value = "";
+                input.size = "10";
+                container.appendChild(input);              
+            }
+
+            container.appendChild(document.createTextNode(" for "));
+
+            var clockcycle = document.createElement("input");
+            clockcycle.type = "text";
+            clockcycle.name = "clockcycle";
+            clockcycle.value = "";
+            clockcycle.size = "3";
+            container.appendChild(clockcycle);
+            container.appendChild(document.createTextNode(" clock cycles"));
+            container.appendChild(document.createElement("br"));
+
+            var appendBtn = document.createElement("input");
+            appendBtn.type = "button";
+            appendBtn.name = "appendBtn";
+            appendBtn.value = "Append";
+            // appendBtn.addEventListener("click", appendPattern, false);
+            appendBtn.onclick = function(){
+                var container = document.getElementById("moreoptions");
+                var numInputEl = 3;
+                if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+                    var n = FSM._inputs.length;
+                }
+                else var n = 1;
+
+                for (var i=0;i<n;i++){           
+                    var pattern =  container.childNodes[i*3+4].value;
+                    var clockcycle = container.childNodes[n*3+3].value;
+                    var numClk = parseInt(clockcycle);
+                    var inputstr = "";
+                    var k = 0;
+                    
+                    
+                    for (var j=0;j< numClk;j++){
+                        inputstr += pattern[k];
+                        k++;
+                        if (k == pattern.length){
+                            k=0;
+                        }
+                    
+                    }
+                    inputs[i]= inputs[i]+inputstr;
+                }
+                drawAll(myCanvas,myoptions,inputs);
+                container = document.getElementById("container");
+                for (var i=0; i<n;i++){
+                    container.childNodes[i*numInputEl+1].value = inputs[i];
+                }
+
+            } 
+            container.appendChild(appendBtn);
+            container.appendChild(document.createTextNode("         "));
+            container.appendChild(randomBtn);
+            container.appendChild(document.createTextNode("         "));
+
+            var clearBtn = document.createElement("input");
+            clearBtn.type = "button";
+            clearBtn.name = "clearBtn";
+            clearBtn.value = "Clear";
+            // clearBtn.addEventListener("click", clearinputs, false);
+            clearBtn.onclick = function(){
+                if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+                    var n = FSM._inputs.length;
+                }
+                else var n = 1;
+                for (var i=0;i<n;i++){           
+                    inputs[i] = "0";
+                }
+                myoptions.startclock = 1;
+                drawAll(myCanvas,myoptions,inputs);
+                var container = document.getElementById("container");
+                for (var i=0; i<n;i++){
+                    container.childNodes[i*3+1].value = inputs[i];
+                }
+            }
+            container.appendChild(clearBtn);
+
+            // container.appendChild(document.createTextNode("         "));
+            // var updateBtn = document.createElement("input");
+            // updateBtn.type = "button";
+            // updateBtn.name = "updateBtn";
+            // updateBtn.value = "Update fields";
+            // updateBtn.onclick = function(){
+            //     var container = document.getElementById("container");
+            //     var numInputEl = 3;
+            //     if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+            //         var n = FSM._inputs.length;
+            //     }
+            //     else var n = 1;
+            //     for (var i=0; i<n;i++){
+            //         container.childNodes[i*numInputEl+1].value = inputs[i];
+            //     }
+            // }
+            // container.appendChild(updateBtn);
+        }
+        else {
+            container.appendChild(document.createElement("br"));
+            container.appendChild(document.createTextNode("Append patterns or randomize"));
+            var randomBtn = document.createElement("input");
+            randomBtn.type = "button";
+            randomBtn.name = "randomBtn";
+            randomBtn.value = "Randomize";
+            // randomBtn.addEventListener("click", randomize, false);
+            randomBtn.onclick = function(){
+                if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+                    var n = FSM._inputs.length;
+                }
+                else var n = 1;
+            
+                var container = document.getElementById("moreoptions");
+                
+                for (var i=0;i<n;i++){  
+                    var inputstr = "";
+                    var numClk = container.childNodes[n*3+3].value;
+            
+                    for (var j=0; j< numClk ;j++) {
+                        
+                        inputstr += String.fromCharCode(48+(Math.floor(Math.random()*2)));
+                    }      
+                     
+                    inputs[i] = inputstr; 
+                } 
+                myoptions.startclock = 1;   
+                drawAll(myCanvas,myoptions,inputs);
+
+                container = document.getElementById("container");
+                for (var i=0; i<n;i++){
+                    container.childNodes[i*3+1].value = inputs[i];
+                }
+            }
+
+            container.appendChild(document.createElement("br"));
+            container.appendChild(document.createTextNode(FSM._inputs+": "));
+
+            var input = document.createElement("input");
+            input.type = "text";
+            input.name = FSM._inputs+"pattern";
+            input.value = "";
+            container.appendChild(input);
+            container.appendChild(document.createTextNode(" for "));
+
+            var clockcycle = document.createElement("input");
+            clockcycle.type = "text";
+            clockcycle.name = "clockcycle";
+            clockcycle.value = "";
+            clockcycle.size = "3";
+            container.appendChild(clockcycle);
+            container.appendChild(document.createTextNode(" clock cycles"));
+            container.appendChild(document.createElement("br"));
+
+            var appendBtn = document.createElement("input");
+            appendBtn.type = "button";
+            appendBtn.name = "appendBtn";
+            appendBtn.value = "Append";
+            // appendBtn.addEventListener("click", appendPattern, false);
+            appendBtn.onclick = function(){
+                var container = document.getElementById("moreoptions");
+                var numInputEl = 3;
+                if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+                    var n = FSM._inputs.length;
+                }
+                else var n = 1;
+
+                for (var i=0;i<n;i++){           
+                    var pattern =  container.childNodes[i*3+4].value;
+                    var clockcycle = container.childNodes[n*3+3].value;
+                    var numClk = parseInt(clockcycle);
+                    var inputstr = "";
+                    var k = 0;
+                    
+                    
+                    for (var j=0;j< numClk;j++){
+                        inputstr += pattern[k];
+                        k++;
+                        if (k == pattern.length){
+                            k=0;
+                        }
+                    
+                    }
+                    inputs[i]= inputs[i]+inputstr;
+                }
+                drawAll(myCanvas,myoptions,inputs);
+                container = document.getElementById("container");
+                for (var i=0; i<n;i++){
+                    container.childNodes[i*numInputEl+1].value = inputs[i];
+                }
+
+            } 
+            container.appendChild(appendBtn);
+            container.appendChild(document.createTextNode("         "));
+            container.appendChild(randomBtn);
+            container.appendChild(document.createTextNode("         "));
+
+            var clearBtn = document.createElement("input");
+            clearBtn.type = "button";
+            clearBtn.name = "clearBtn";
+            clearBtn.value = "Clear";
+            // clearBtn.addEventListener("click", clearinputs, false);
+            clearBtn.onclick = function(){
+                if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+                    var n = FSM._inputs.length;
+                }
+                else var n = 1;
+                for (var i=0;i<n;i++){           
+                    inputs[i] = "0";
+                }
+                myoptions.startclock = 1;
+                drawAll(myCanvas,myoptions,inputs);
+                var container = document.getElementById("container");
+                for (var i=0; i<n;i++){
+                    container.childNodes[i*numInputEl+1].value = inputs[i];
+                }
+            }
+            container.appendChild(clearBtn);
+
+            // container.appendChild(document.createTextNode("         "));
+            // var updateBtn = document.createElement("input");
+            // updateBtn.type = "button";
+            // updateBtn.name = "updateBtn";
+            // updateBtn.value = "Update fields";
+            // updateBtn.onclick = function(){
+            //     var container = document.getElementById("container");
+            //     var numInputEl = 3;
+            //     if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+            //         var n = FSM._inputs.length;
+            //     }
+            //     else var n = 1;
+            //     for (var i=0; i<n;i++){
+            //         container.childNodes[i*numInputEl+1].value = inputs[i];
+            //     }
+            // }
+            // container.appendChild(updateBtn);
+        }
+    }
+    else {
+        optionbtn.value = "more input options";
+        while (container.hasChildNodes()){
+            container.removeChild(container.lastChild);
+        }
+    }
+}
+// function appendPattern(){
+//     var container = document.getElementById("moreoptions");
+
+//     if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+//         var n = FSM._inputs.length;
+//     }
+//     else {
+//         var n = 1;
+//     }
+//     for (var i=0;i<n;i++){           
+//         var pattern =  container.childNodes[i*3+4].value;
+//         var clockcycle = container.childNodes[n*3+3].value;
+//         var numClk = parseInt(clockcycle);
+//         var inputstr = "";
+//         var k = 0;
+        
+        
+//         for (var j=0;j< numClk;j++){
+//             inputstr += pattern[k];
+//             k++;
+//             if (k == pattern.length){
+//                 k=0;
+//             }
+        
+//         }
+//         inputs[i]= inputs[i]+inputstr;
+//     }
+//     drawAll(myCanvas,myoptions,inputs);
+// }
+
+function clearinputs(){
+    if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+        var n = FSM._inputs.length;
+    }
+    else var n = 1;
+    for (var i=0;i<n;i++){           
+        inputs[i] = "0";
+    }
+    myoptions.startclock = 1;
+    drawAll(myCanvas,myoptions,inputs);
+}
+
+function randomize(){
+
+    if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
+        var n = FSM._inputs.length;
+    }
+    else var n = 1;
+
+    var container = document.getElementById("moreoptions");
+
+    for (var i=0;i<n;i++){  
+        var inputstr = "";
+        var numClk = container.childNodes[n*3+3].value;
+
+        for (var j=0; j< numClk ;j++) {
+            
+            inputstr += String.fromCharCode(48+(Math.floor(Math.random()*2)));
+        }      
+         
+        inputs[i] = inputstr; 
+    } 
+    myoptions.startclock = 1;   
+    drawAll(myCanvas,myoptions,inputs);
+}
+
 function getOutput(state,curIn) {
     if (FSM._type == "Moore") {
         return state._outputs;
