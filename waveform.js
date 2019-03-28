@@ -935,8 +935,9 @@ function writeTBCode(){
     for (var j=0; j<inputs[0].length; j++){
         if (inputs.length > 1){
             for (var i=0; i<inputs.length; i++){
-                code += FSM._inputs[i] + "=" + inputs[i][j] + ";#" + delay2 + ";\n";
+                code += FSM._inputs[i] + "=" + inputs[i][j] + ";";
             }
+            code += "#" + delay2 + ";\n";
         }
         else {
             code += FSM._inputs + "=" + inputs[0][j] + ";#" + delay2 + ";\n";
