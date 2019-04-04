@@ -315,7 +315,7 @@ function drawAll (canvas,options,inputs){
     var clockWave = new clock(
         myCanvas,
         // inputs[0].length,
-        102,
+        101,
         options,
         wavecount,
         "CLK"
@@ -554,7 +554,7 @@ function toggleOptions(button){
                 if (numClk == "") alert("enter clock cycles");
                 else if (!isNumberString(numClk)) alert("invalid clock cycle value");
                 else {
-                    if (numClk > 102) numClk = 102;
+                    if (numClk > 100) numClk = 100;
                     for (var i=0;i<n;i++){  
                         var inputstr = "";
                         
@@ -596,7 +596,7 @@ function toggleOptions(button){
             clockcycle.value = "";
             clockcycle.size = "3";
             container.appendChild(clockcycle);
-            container.appendChild(document.createTextNode(" clock cycles"));
+            container.appendChild(document.createTextNode(" clock cycles (max: 100)"));
             container.appendChild(document.createElement("br"));
 
             var appendBtn = document.createElement("input");
@@ -696,7 +696,7 @@ function toggleOptions(button){
                 if (numClk == "") alert("enter clock cycles");
                 else if (!isNumberString(numClk)) alert("invalid clock cycle value");
                 else {
-                    if (numClk > 102) numClk = 102;
+                    if (numClk > 100) numClk = 100;
                     for (var i=0;i<n;i++){  
                         var inputstr = "";
                         
@@ -734,7 +734,7 @@ function toggleOptions(button){
             clockcycle.value = "";
             clockcycle.size = "3";
             container.appendChild(clockcycle);
-            container.appendChild(document.createTextNode(" clock cycles"));
+            container.appendChild(document.createTextNode(" clock cycles (max: 100)"));
             container.appendChild(document.createElement("br"));
 
             var appendBtn = document.createElement("input");
@@ -840,17 +840,18 @@ function writeTBCode(){
     "wire " + FSM._outputs.join(", ") + ";\n\n" +
     "fsm dut(\n" +
     "\tclk, ";
-    if (FSM._reset = "1"){ 
+    if (FSM._reset == "1"){ 
         code += "reset, ";
     } 
     code += FSM._inputs.join(", ") + ",\n" +
     "\t" + FSM._outputs.join(", ") + "\n);\n\n" +
     "initial\nbegin\n\n" +
     "clk = 1'b0;\n\n";
-    if (FSM._reset = "1"){ 
-        code += "reset=0;";
+    if (FSM._reset == "1"){ 
+        code += "reset=1;";
     } 
     for (var j=0; j<inputs[0].length; j++){
+        if (j == 1 && FSM._reset == "1") code += "reset=0;";
         if (inputs.length > 1){
             for (var i=0; i<inputs.length; i++){
                 code += FSM._inputs[i] + "=" + inputs[i][j] + ";";

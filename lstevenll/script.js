@@ -15,7 +15,7 @@ var USER_INPUT = {
   reset: "",
 	transitionT: [],
 	type: [],
-	outputT: [],
+  outputT: [],
 }
 
 // pre-loading
@@ -419,7 +419,6 @@ function submitForm3(type, outputT) {
 	USER_INPUT.transitionT = transitionT;
 	USER_INPUT.type = type;
 	USER_INPUT.outputT = outputT;
-	
 
   // data required by partner
   console.log("inputs: ")
