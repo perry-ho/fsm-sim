@@ -20,6 +20,7 @@ EG_MOORE_1.states = ["S0", "S1", "S2", "S3"];
 
 // data type: string
 EG_MOORE_1.resetState = "S0";
+EG_MOORE_1.reset = "1";
 
 /* ---------- Section II - State Transition Table -------------------------- */
 
@@ -66,6 +67,7 @@ EG_MOORE_2.inputs = ["A"];
 EG_MOORE_2.outputs = ["Y"];
 EG_MOORE_2.states = ["S0", "S1", "S2"];
 EG_MOORE_2.resetState = "S0";
+EG_MOORE_2.reset = "1";
 
 EG_MOORE_2.transitionT = [
     [  "S0",     "0",     "S1"  ],
@@ -98,6 +100,7 @@ EG_MEALY.inputs = ["A"];
 EG_MEALY.outputs = ["Y"];
 EG_MEALY.states = ["S0", "S1"];
 EG_MEALY.resetState = "S0";
+EG_MEALY.reset = "1";
 
 EG_MEALY.transitionT = [
     [  "S0",     "0",     "S1"  ],

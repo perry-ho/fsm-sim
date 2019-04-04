@@ -1,6 +1,8 @@
 var myCanvas = document.getElementById("myCanvas");
-myCanvas.width = 500;
-// myCanvas.height = 500;
+
+myCanvas.width = 460;
+
+var clkWidth = Math.floor((myCanvas.width - 50) / 40);
 if  (typeof FSM._outputs === 'string' || FSM._outputs instanceof String) {
     if  (typeof FSM._inputs === 'string' || FSM._inputs instanceof String) {
         myCanvas.height = 300;
@@ -19,9 +21,7 @@ else    {
 }
 var ctx = myCanvas.getContext("2d");
 
-var inputs = []
-
-
+var inputs = [];
 
 var myoptions = {
     labelheight:15,
@@ -37,7 +37,6 @@ var myoptions = {
     font:"15px Arial"
 }
 
-
 function drawLine(ctx, startX, startY, endX, endY,color){
 
     ctx.strokeStyle = color;
@@ -48,6 +47,7 @@ function drawLine(ctx, startX, startY, endX, endY,color){
     ctx.stroke();
 
 }
+
 function drawDotted(ctx, startX, startY, endX, endY,color){
 
     ctx.strokeStyle = color;
@@ -322,16 +322,19 @@ function drawAll (canvas,options,inputs){
     )
     wavecount++;
     clockWave.draw();
-    var resetStr = "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
-    var reset = new Waveform(
-        myCanvas,
-        resetStr,
-        options,
-        wavecount,
-        "RST"
-    )
-    wavecount++;
-    reset.draw();
+    
+    if (FSM._reset == 1){
+        var resetStr = "100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000";
+        var reset = new Waveform(
+            myCanvas,
+            resetStr,
+            options,
+            wavecount,
+            "RST"
+        )
+        wavecount++;
+        reset.draw();
+    }
 
     if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
         var n = FSM._inputs.length;
@@ -436,31 +439,11 @@ function drawAll (canvas,options,inputs){
             FSM._outputs
         )
     }
-    // var outputWave1 = new stateWave(
-    //     myCanvas,
-    //     outputA,
-    //     options,
-    //     wavecount,
-    //     "LA"
-    // )
-    // wavecount++;
-    // outputWave1.draw();
-
-    // var outputWave2 = new stateWave(
-    //     myCanvas,
-    //     outputB,
-    //     options,
-    //     wavecount,
-    //     "LB"
-    // )
-    // wavecount++;
-    // outputWave2.draw();
-    // }
 }
 
 function prevCycle() {
-    if (myoptions.startclock > 10) {
-        myoptions.startclock = myoptions.startclock - 10;
+    if (myoptions.startclock > clkWidth) {
+        myoptions.startclock = myoptions.startclock - clkWidth;
         drawAll(myCanvas,myoptions,inputs);
     }
     else alert("Limit reached");
@@ -468,8 +451,8 @@ function prevCycle() {
 
 function nextCycle() {
     if (myoptions.startclock == 91) alert("Limit reached");
-    else if (inputs[0].length - myoptions.startclock >= 10){
-        myoptions.startclock = myoptions.startclock + 10;
+    else if (inputs[0].length - myoptions.startclock >= clkWidth){
+        myoptions.startclock = myoptions.startclock + clkWidth;
         drawAll(myCanvas,myoptions,inputs);
     }
     else alert("Limit reached");
@@ -544,13 +527,7 @@ function addFields(){
         inputs[0]="0";
     }
     
-    // var button = document.createElement("input");
-    // button.name = "button";
-    // button.type = "button";
-    // button.value = "submit";
-    // button.onclick = "updateWave()";
-    // container.appendChild(button);
-    // container.appendChild(document.createElement("br"));
+
 }
 function toggleOptions(button){
     var optionbtn = button;
@@ -565,7 +542,7 @@ function toggleOptions(button){
             randomBtn.type = "button";
             randomBtn.name = "randomBtn";
             randomBtn.value = "Randomize";
-            // randomBtn.addEventListener("click", randomize, false);
+
             randomBtn.onclick = function(){
                 if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
                     var n = FSM._inputs.length;
@@ -573,24 +550,29 @@ function toggleOptions(button){
                 else var n = 1;
             
                 var container = document.getElementById("moreoptions");
-                
-                for (var i=0;i<n;i++){  
-                    var inputstr = "";
-                    var numClk = container.childNodes[n*3+3].value;
-            
-                    for (var j=0; j< numClk ;j++) {
+                var numClk = container.childNodes[n*3+3].value;
+                if (numClk == "") alert("enter clock cycles");
+                else if (!isNumberString(numClk)) alert("invalid clock cycle value");
+                else {
+                    if (numClk > 102) numClk = 102;
+                    for (var i=0;i<n;i++){  
+                        var inputstr = "";
                         
-                        inputstr += String.fromCharCode(48+(Math.floor(Math.random()*2)));
-                    }      
-                     
-                    inputs[i] = inputstr; 
-                } 
-                myoptions.startclock = 1;   
-                drawAll(myCanvas,myoptions,inputs);
+                
+                        for (var j=0; j< numClk ;j++) {
+                            
+                            inputstr += String.fromCharCode(48+(Math.floor(Math.random()*2)));
+                        }      
+                        
+                        inputs[i] = inputstr; 
+                    } 
+                    myoptions.startclock = 1;   
+                    drawAll(myCanvas,myoptions,inputs);
 
-                container = document.getElementById("container");
-                for (var i=0; i<n;i++){
-                    container.childNodes[i*3+1].value = inputs[i];
+                    container = document.getElementById("container");
+                    for (var i=0; i<n;i++){
+                        container.childNodes[i*3+1].value = inputs[i];
+                    }
                 }
             }
 
@@ -621,7 +603,7 @@ function toggleOptions(button){
             appendBtn.type = "button";
             appendBtn.name = "appendBtn";
             appendBtn.value = "Append";
-            // appendBtn.addEventListener("click", appendPattern, false);
+
             appendBtn.onclick = function(){
                 var container = document.getElementById("moreoptions");
                 var numInputEl = 3;
@@ -630,28 +612,41 @@ function toggleOptions(button){
                 }
                 else var n = 1;
 
-                for (var i=0;i<n;i++){           
-                    var pattern =  container.childNodes[i*3+4].value;
-                    var clockcycle = container.childNodes[n*3+3].value;
-                    var numClk = parseInt(clockcycle);
-                    var inputstr = "";
-                    var k = 0;
-                    
-                    
-                    for (var j=0;j< numClk;j++){
-                        inputstr += pattern[k];
-                        k++;
-                        if (k == pattern.length){
-                            k=0;
-                        }
-                    
+                var numClk = container.childNodes[n*3+3].value;
+                var flag = 0;
+
+                for (var i=0;i<n;i++){
+                    if (container.childNodes[i*3+4].value == "" || !isBinaryString(container.childNodes[i*3+4].value)){
+                        flag = 1; 
                     }
-                    inputs[i]= inputs[i]+inputstr;
                 }
-                drawAll(myCanvas,myoptions,inputs);
-                container = document.getElementById("container");
-                for (var i=0; i<n;i++){
-                    container.childNodes[i*numInputEl+1].value = inputs[i];
+                if (flag == 1){
+                    alert("Invalid input value(s)");
+                    flag = 0;
+                }
+                else if (numClk == "") alert("enter clock cycles");
+                else if (!isNumberString(numClk)) alert("invalid clock cycle value");
+                else {
+                    for (var i=0;i<n;i++){           
+                        var pattern =  container.childNodes[i*3+4].value;                    
+                        var inputstr = "";
+                        var k = 0;
+                        
+                        for (var j=0;j< numClk;j++){
+                            inputstr += pattern[k];
+                            k++;
+                            if (k == pattern.length){
+                                k=0;
+                            }
+                        
+                        }
+                        inputs[i]= inputs[i]+inputstr;
+                    }
+                    drawAll(myCanvas,myoptions,inputs);
+                    container = document.getElementById("container");
+                    for (var i=0; i<n;i++){
+                        container.childNodes[i*numInputEl+1].value = inputs[i];
+                    }
                 }
 
             } 
@@ -664,7 +659,7 @@ function toggleOptions(button){
             clearBtn.type = "button";
             clearBtn.name = "clearBtn";
             clearBtn.value = "Clear";
-            // clearBtn.addEventListener("click", clearinputs, false);
+
             clearBtn.onclick = function(){
                 if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
                     var n = FSM._inputs.length;
@@ -681,24 +676,6 @@ function toggleOptions(button){
                 }
             }
             container.appendChild(clearBtn);
-
-            // container.appendChild(document.createTextNode("         "));
-            // var updateBtn = document.createElement("input");
-            // updateBtn.type = "button";
-            // updateBtn.name = "updateBtn";
-            // updateBtn.value = "Update fields";
-            // updateBtn.onclick = function(){
-            //     var container = document.getElementById("container");
-            //     var numInputEl = 3;
-            //     if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
-            //         var n = FSM._inputs.length;
-            //     }
-            //     else var n = 1;
-            //     for (var i=0; i<n;i++){
-            //         container.childNodes[i*numInputEl+1].value = inputs[i];
-            //     }
-            // }
-            // container.appendChild(updateBtn);
         }
         else {
             container.appendChild(document.createElement("br"));
@@ -707,7 +684,7 @@ function toggleOptions(button){
             randomBtn.type = "button";
             randomBtn.name = "randomBtn";
             randomBtn.value = "Randomize";
-            // randomBtn.addEventListener("click", randomize, false);
+
             randomBtn.onclick = function(){
                 if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
                     var n = FSM._inputs.length;
@@ -715,24 +692,29 @@ function toggleOptions(button){
                 else var n = 1;
             
                 var container = document.getElementById("moreoptions");
-                
-                for (var i=0;i<n;i++){  
-                    var inputstr = "";
-                    var numClk = container.childNodes[n*3+3].value;
-            
-                    for (var j=0; j< numClk ;j++) {
+                var numClk = container.childNodes[n*3+3].value;
+                if (numClk == "") alert("enter clock cycles");
+                else if (!isNumberString(numClk)) alert("invalid clock cycle value");
+                else {
+                    if (numClk > 102) numClk = 102;
+                    for (var i=0;i<n;i++){  
+                        var inputstr = "";
                         
-                        inputstr += String.fromCharCode(48+(Math.floor(Math.random()*2)));
-                    }      
-                     
-                    inputs[i] = inputstr; 
-                } 
-                myoptions.startclock = 1;   
-                drawAll(myCanvas,myoptions,inputs);
+                
+                        for (var j=0; j< numClk ;j++) {
+                            
+                            inputstr += String.fromCharCode(48+(Math.floor(Math.random()*2)));
+                        }      
+                        
+                        inputs[i] = inputstr; 
+                    } 
+                    myoptions.startclock = 1;   
+                    drawAll(myCanvas,myoptions,inputs);
 
-                container = document.getElementById("container");
-                for (var i=0; i<n;i++){
-                    container.childNodes[i*3+1].value = inputs[i];
+                    container = document.getElementById("container");
+                    for (var i=0; i<n;i++){
+                        container.childNodes[i*3+1].value = inputs[i];
+                    }
                 }
             }
 
@@ -759,7 +741,7 @@ function toggleOptions(button){
             appendBtn.type = "button";
             appendBtn.name = "appendBtn";
             appendBtn.value = "Append";
-            // appendBtn.addEventListener("click", appendPattern, false);
+
             appendBtn.onclick = function(){
                 var container = document.getElementById("moreoptions");
                 var numInputEl = 3;
@@ -768,28 +750,41 @@ function toggleOptions(button){
                 }
                 else var n = 1;
 
-                for (var i=0;i<n;i++){           
-                    var pattern =  container.childNodes[i*3+4].value;
-                    var clockcycle = container.childNodes[n*3+3].value;
-                    var numClk = parseInt(clockcycle);
-                    var inputstr = "";
-                    var k = 0;
-                    
-                    
-                    for (var j=0;j< numClk;j++){
-                        inputstr += pattern[k];
-                        k++;
-                        if (k == pattern.length){
-                            k=0;
-                        }
-                    
+                var numClk = container.childNodes[n*3+3].value;
+                var flag = 0;
+
+                for (var i=0;i<n;i++){
+                    if (container.childNodes[i*3+4].value == "" || !isBinaryString(container.childNodes[i*3+4].value)){
+                        flag = 1; 
                     }
-                    inputs[i]= inputs[i]+inputstr;
                 }
-                drawAll(myCanvas,myoptions,inputs);
-                container = document.getElementById("container");
-                for (var i=0; i<n;i++){
-                    container.childNodes[i*numInputEl+1].value = inputs[i];
+                if (flag == 1){
+                    alert("Invalid input value(s)");
+                    flag = 0;
+                }
+                else if (numClk == "") alert("enter clock cycles");
+                else if (!isNumberString(numClk)) alert("invalid clock cycle value");
+                else {
+                    for (var i=0;i<n;i++){           
+                        var pattern =  container.childNodes[i*3+4].value;                    
+                        var inputstr = "";
+                        var k = 0;
+                        
+                        for (var j=0;j< numClk;j++){
+                            inputstr += pattern[k];
+                            k++;
+                            if (k == pattern.length){
+                                k=0;
+                            }
+                        
+                        }
+                        inputs[i]= inputs[i]+inputstr;
+                    }
+                    drawAll(myCanvas,myoptions,inputs);
+                    container = document.getElementById("container");
+                    for (var i=0; i<n;i++){
+                        container.childNodes[i*numInputEl+1].value = inputs[i];
+                    }
                 }
 
             } 
@@ -819,24 +814,6 @@ function toggleOptions(button){
                 }
             }
             container.appendChild(clearBtn);
-
-            // container.appendChild(document.createTextNode("         "));
-            // var updateBtn = document.createElement("input");
-            // updateBtn.type = "button";
-            // updateBtn.name = "updateBtn";
-            // updateBtn.value = "Update fields";
-            // updateBtn.onclick = function(){
-            //     var container = document.getElementById("container");
-            //     var numInputEl = 3;
-            //     if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
-            //         var n = FSM._inputs.length;
-            //     }
-            //     else var n = 1;
-            //     for (var i=0; i<n;i++){
-            //         container.childNodes[i*numInputEl+1].value = inputs[i];
-            //     }
-            // }
-            // container.appendChild(updateBtn);
         }
     }
     else {
@@ -846,71 +823,7 @@ function toggleOptions(button){
         }
     }
 }
-// function appendPattern(){
-//     var container = document.getElementById("moreoptions");
 
-//     if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
-//         var n = FSM._inputs.length;
-//     }
-//     else {
-//         var n = 1;
-//     }
-//     for (var i=0;i<n;i++){           
-//         var pattern =  container.childNodes[i*3+4].value;
-//         var clockcycle = container.childNodes[n*3+3].value;
-//         var numClk = parseInt(clockcycle);
-//         var inputstr = "";
-//         var k = 0;
-        
-        
-//         for (var j=0;j< numClk;j++){
-//             inputstr += pattern[k];
-//             k++;
-//             if (k == pattern.length){
-//                 k=0;
-//             }
-        
-//         }
-//         inputs[i]= inputs[i]+inputstr;
-//     }
-//     drawAll(myCanvas,myoptions,inputs);
-// }
-
-// function clearinputs(){
-//     if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
-//         var n = FSM._inputs.length;
-//     }
-//     else var n = 1;
-//     for (var i=0;i<n;i++){           
-//         inputs[i] = "0";
-//     }
-//     myoptions.startclock = 1;
-//     drawAll(myCanvas,myoptions,inputs);
-// }
-
-// function randomize(){
-
-//     if (!(typeof FSM._inputs == 'string' || FSM._inputs instanceof String)){
-//         var n = FSM._inputs.length;
-//     }
-//     else var n = 1;
-
-//     var container = document.getElementById("moreoptions");
-
-//     for (var i=0;i<n;i++){  
-//         var inputstr = "";
-//         var numClk = container.childNodes[n*3+3].value;
-
-//         for (var j=0; j< numClk ;j++) {
-            
-//             inputstr += String.fromCharCode(48+(Math.floor(Math.random()*2)));
-//         }      
-         
-//         inputs[i] = inputstr; 
-//     } 
-//     myoptions.startclock = 1;   
-//     drawAll(myCanvas,myoptions,inputs);
-// }
 function writeTBCode(){
     var timescale = document.getElementById("timescale").value;
     var timeprec = document.getElementById("timeprec").value;
@@ -926,12 +839,17 @@ function writeTBCode(){
     "reg clk, reset, " + FSM._inputs.join(", ") + ";\n" +
     "wire " + FSM._outputs.join(", ") + ";\n\n" +
     "fsm dut(\n" +
-    "\tclk, reset, " + FSM._inputs.join(", ") + ",\n" +
+    "\tclk, ";
+    if (FSM._reset = "1"){ 
+        code += "reset, ";
+    } 
+    code += FSM._inputs.join(", ") + ",\n" +
     "\t" + FSM._outputs.join(", ") + "\n);\n\n" +
-    "always\n#" + delay1 + " clk = ~clk\n\n" +
     "initial\nbegin\n\n" +
     "clk = 1'b0;\n\n";
-    
+    if (FSM._reset = "1"){ 
+        code += "reset=0;";
+    } 
     for (var j=0; j<inputs[0].length; j++){
         if (inputs.length > 1){
             for (var i=0; i<inputs.length; i++){
@@ -945,6 +863,8 @@ function writeTBCode(){
     }
 
     code += "\nend\n\n" +
+    "always\nbegin\n#" + delay1 + " clk = ~clk\nend\n\n" +
+
     "endmodule\n";
 
     return code;
