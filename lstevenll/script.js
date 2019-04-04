@@ -12,7 +12,7 @@ var USER_INPUT = {
 	ouputs: [],
 	states: [],
   resetState: [],
-  reset: "1",
+  reset: "",
 	transitionT: [],
 	type: [],
 	outputT: [],
@@ -26,6 +26,11 @@ $(document).ready(() => {
 })
 
 // step 1
+$("#reset").change(() => {
+  USER_INPUT.reset = $("#reset option:selected").val()
+  updateTextArea(false)
+})
+
 $("#inputItemCount").change(() => {
   inputCount = $("#inputItemCount option:selected").val()
   updateTextArea(true)
@@ -172,7 +177,7 @@ function getInputOptionString() {
 }
 
 function addRow(state) {
-  if (stateCountArray[state] >= stateCount) {
+  if (stateCountArray[state] >= Math.pow(2, inputCount)) {
     $("#addRowError").text("Maximum number of state-change reached.")
     return
   } else {
